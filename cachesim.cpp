@@ -2,6 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <bitset>
+#include "cache.h"
 
 #define FETCH 100
 #define LOAD 200
@@ -28,7 +29,7 @@ int main()
   	rewind (rm);
   	long ctr=fSize/8;
     if (rm != NULL) {
-    	for(i=0;i<ctr;i++)
+    	for(i=0;i<5;i++)
     	{
         	fread(buf,8 , 1, rm);
         	switch(detect_instr_type(buf[0]))
@@ -36,6 +37,7 @@ int main()
     			case FETCH :
                     cout<<"FETCH"<<endl;
     				process(buf[0],FETCH);
+    				l1i_fetch(buf[0]);
     				break;
     			case LOAD :
                     cout<<"LOAD"<<endl;

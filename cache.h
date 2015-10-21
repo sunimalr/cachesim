@@ -1,5 +1,6 @@
 #ifndef CACHE_H
 #define CACHE_H
+#endif
 
 struct cache_line_block{
 	int valid;
@@ -12,6 +13,9 @@ struct l1i_cache_set{
 };
 typedef l1i_cache_set l1i_cache_set;
 
-l1i_cache_set cache_l1i[64];
+
 
 int l1i_fetch(unsigned long long address);
+unsigned long long get_offset(unsigned long long address);
+unsigned long long get_set_index(unsigned long long address);
+unsigned long long get_tag(unsigned long long address);
