@@ -26,8 +26,9 @@ unsigned long long get_set_index(unsigned long long address)
 {
 	//Associativity = 8
 	unsigned long long temp,set_index;
-	temp = (address & 0x7EC0);
-	set_index = temp >> 6;
+	temp = address >> 6;
+	set_index = (temp & 0x7);
+	
 	cout<<"set_index : "<<hex<<set_index<<endl;
 	return set_index;
 }
@@ -35,7 +36,7 @@ unsigned long long get_set_index(unsigned long long address)
 unsigned long long get_tag(unsigned long long address)
 {
 	unsigned long long tag;
-	tag = (address >> 15);
+	tag = (address >> 9);
 	cout<<"tag : "<<hex<<tag<<endl;
 	return tag;
 }

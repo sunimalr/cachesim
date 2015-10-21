@@ -29,7 +29,7 @@ int main()
   	rewind (rm);
   	long ctr=fSize/8;
     if (rm != NULL) {
-    	for(i=0;i<5;i++)
+    	for(i=0;i<47;i++)
     	{
         	fread(buf,8 , 1, rm);
         	switch(detect_instr_type(buf[0]))
