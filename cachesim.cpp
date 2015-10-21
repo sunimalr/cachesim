@@ -8,47 +8,44 @@
 #define STORE 300
 
 using namespace std;
-int process(unsigned long long address, string instruction);
+int process(unsigned long long address, int instruction);
 int detect_instr_type(unsigned long long buffer);
+unsigned long long remove_encoded_bits(unsigned long long buffer, int type);
 
 int main()
 {
 	FILE *rm;
     unsigned long long buf[1];
-    char b[9];
     int i;
     long fSize;
     
     rm = fopen("ls.trace", "rb");
-    //rm = fopen("test.txt", "r");
     buf[0]=0;
 
     // obtain file size:
   	fseek (rm , 0 , SEEK_END);
   	fSize = ftell (rm);
   	rewind (rm);
-  	//cout<<fSize<<endl;
   	long ctr=fSize/8;
     if (rm != NULL) {
     	for(i=0;i<ctr;i++)
     	{
         	fread(buf,8 , 1, rm);
-        	//cout<<bitset<64>(buf[0])<<endl
-        	//cout<<hex<<buf[0]<<endl;
-        	//cout<<(buf[0]&0x8000000000000000)<<endl;
-        	//cout<<(buf[0]&0x4000000000000000)<<endl;
-        		switch(detect_instr_type(buf[0]))
-        		{
-        			case FETCH :
-        				process(buf[0],FETCH);
-        				break;
-        			case LOAD :
-        				process(buf[0],LOAD);
-        				break :
-        			case STORE :
-        				process(buf[0],STORE);
-        				break;
-        		}
+        	switch(detect_instr_type(buf[0]))
+    		{
+    			case FETCH :
+                    cout<<"FETCH"<<endl;
+    				process(buf[0],FETCH);
+    				break;
+    			case LOAD :
+                    cout<<"LOAD"<<endl;
+    				process(remove_encoded_bits(buf[0],LOAD),LOAD);
+    				break;
+    			case STORE :
+                    cout<<"STORE"<<endl;
+    				process(remove_encoded_bits(buf[0],STORE),STORE);
+    				break;
+    		}
 	    }
 	    fclose(rm);
 	    cout<<"END"<<endl;
@@ -62,11 +59,58 @@ int main()
 
 int process(unsigned long long address, int instruction)
 {
-	if(address)
+    cout<<"Address : "<<hex<<address<<endl;
 	return 0;
 }
 
 int detect_instr_type(unsigned long long buffer)
 {
+    int bit63,bit62;
+    if((buffer & 0x8000000000000000) > 0)
+    {
+        bit63=1;
+    }
+    else
+    {
+        bit63=0;
+    }
+
+    if((buffer & 0x4000000000000000) > 0)
+    {
+        bit62=1;
+    }
+    else
+    {
+        bit62=0;
+    }
+
+    if((bit63==0)&&(bit62==0))
+    {
+        return FETCH;
+    }
+
+    if((bit63==0)&&(bit62==1))
+    {
+        return LOAD;
+    }
+
+    if((bit63==1)&&(bit62==0))
+    {
+        return STORE;
+    }
+    cout<<"Corrupted Address"<<endl;
 	return 0;
+}
+
+unsigned long long remove_encoded_bits(unsigned long long buffer, int type)
+{
+    if(type==STORE)
+    {
+        return (buffer^0x8000000000000000);
+    }
+    if(type==LOAD)
+    {
+        return (buffer^0x4000000000000000);
+    }
+    return 0;
 }
