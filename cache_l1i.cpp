@@ -2,7 +2,7 @@
 #include <cstdio>
 #include <iostream>
 #include <cstdlib>
-#include "cache.h"
+#include "cache.hpp"
 
 using namespace std;
 l1i_cache_set cache_l1i[64];

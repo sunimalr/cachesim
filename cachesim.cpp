@@ -2,7 +2,7 @@
 #include <iostream>
 #include <cstdlib>
 #include <bitset>
-#include "cache.h"
+#include "cache.hpp"
 
 #define FETCH 100
 #define LOAD 200
