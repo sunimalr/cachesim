@@ -15,11 +15,15 @@ unsigned long long remove_encoded_bits(unsigned long long buffer, int type);
 
 int main()
 {
-	FILE *rm;
+    //Init cache
+    void init_l1i_cache();
+	
+    FILE *rm;
     unsigned long long buf[1];
     int i;
     long fSize;
     
+    //Open trace file
     rm = fopen("ls.trace", "rb");
     buf[0]=0;
 
@@ -37,7 +41,7 @@ int main()
     			case FETCH :
                     cout<<"FETCH"<<endl;
     				process(buf[0],FETCH);
-    				l1i_fetch(buf[0]);
+    				l1i_check(buf[0]);
     				break;
     			case LOAD :
                     cout<<"LOAD"<<endl;

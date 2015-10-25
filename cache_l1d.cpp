@@ -6,7 +6,7 @@
 
 using namespace std;
 
-l1i_cache_set cache_l1i[64];
+l1i_cache_set cache_l1d[64];
 
 //Returns 1 if hit, 0 if miss);
 int l1i_check(unsigned long long address)
@@ -27,17 +27,17 @@ int l1i_check(unsigned long long address)
 			if(tag == cache_tag)
 			{
 				//HIT
-				cout << "L1-i HIT" << endl; 
+				cout << "L1-d HIT" << endl; 
 				return 1;
 			}
 			else
 			{	
-				cout << "L1-i MISS" << endl; 
+				cout << "L1-d MISS" << endl; 
 				return 0;	
 			}
 		}
 	}
-	cout << "L1-i MISS" << endl;
+	cout << "L1-d MISS" << endl;
 	return 0;
 }
 
