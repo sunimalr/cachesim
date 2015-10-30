@@ -46,10 +46,12 @@ int main()
     			case LOAD :
                     cout<<"LOAD"<<endl;
     				process(remove_encoded_bits(buf[0],LOAD),LOAD);
+                    l1d_check(buf[0],LOAD);
     				break;
     			case STORE :
                     cout<<"STORE"<<endl;
     				process(remove_encoded_bits(buf[0],STORE),STORE);
+                    l1d_check(buf[0],STORE);
     				break;
     		}
 	    }

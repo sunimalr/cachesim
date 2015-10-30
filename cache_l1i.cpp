@@ -52,9 +52,10 @@ int l1i_check(unsigned long long address)
 		}
 	}
 	cout << "L1-i MISS" << endl;
-	//get from L2 cache
-	//select which way to put data
+	
+	//get from L2 cache : TODO
 
+	//select which way to put data
 	if(isInvalid != -1)//If there is an invalid block replace it
 	{
 		(cache_l1i[set_index].set[isInvalid]).valid=1;
@@ -79,8 +80,6 @@ int l1i_check(unsigned long long address)
 
 	return 0;
 }
-
-
 
 void init_l1i_cache()
 {
