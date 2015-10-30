@@ -6,7 +6,7 @@
 
 using namespace std;
 
-int get_8_way_lru_position(int *lru_bits)
+int get_8_way_tree_lru_position(int *lru_bits)
 {
 	//block0
 	if((lru_bits[0]==0)&&(lru_bits[1]==0)&&(lru_bits[3]==0))
@@ -67,6 +67,36 @@ int get_8_way_lru_position(int *lru_bits)
 	return -1;//Error
 }
 
+int get_8_way_bit_lru_position(cache_line_block *cache_8_block)
+{
+	int x;
+	for(x=0;x<8;x++)
+	{
+		if(cache_8_block[x].mru_bit==0)
+		{
+			return x;
+		}
+	}
+	return -1;//Error
+}
+
+void flip_if_all_mru_bits_are_1(cache_line_block *cb)
+{
+	if((cb[0].mru_bit&cb[1].mru_bit&cb[2].mru_bit&cb[3].mru_bit&cb[4].mru_bit&cb[5].mru_bit&cb[6].mru_bit&cb[7].mru_bit)==1)
+	{
+		cb[0].mru_bit=0;
+		cb[1].mru_bit=0;
+		cb[2].mru_bit=0;
+		cb[3].mru_bit=0;
+		cb[4].mru_bit=0;
+		cb[5].mru_bit=0;
+		cb[6].mru_bit=0;
+		cb[7].mru_bit=0;
+	}
+
+}
+
+//For tree plru
 void flip_bits(int *lru_bits, int pos1, int pos2, int pos3)
 {
 	int x;

@@ -31,6 +31,12 @@ int l1i_check(unsigned long long address)
 			{
 				//HIT
 				cout << "L1-i HIT" << endl; 
+				
+				#ifdef BPLRU
+					(cache_l1i[set_index].set[y]).mru_bit=1;
+					flip_if_all_mru_bits_are_1(cache_l1i[set_index].set);
+				#endif
+				
 				return 1;
 			}
 			else
@@ -56,10 +62,18 @@ int l1i_check(unsigned long long address)
 	}
 	else//else use cache replacement policy and find out which block to replace
 	{
-		int way=get_8_way_lru_position(lru_bits_l1i);
-		(cache_l1i[set_index].set[way]).valid=1;
-		(cache_l1i[set_index].set[way]).tag=tag;
-		cout<<"replaced with LRU"<<endl;
+		int way;
+		#ifdef BPLRU
+			way=get_8_way_bit_lru_position(cache_l1i[set_index].set);
+			(cache_l1i[set_index].set[way]).valid=1;
+			(cache_l1i[set_index].set[way]).tag=tag;
+			cout<<"replaced with BIT PLRU"<<endl;
+		#else 
+			way=get_8_way_tree_lru_position(lru_bits_l1i);
+			(cache_l1i[set_index].set[way]).valid=1;
+			(cache_l1i[set_index].set[way]).tag=tag;
+			cout<<"replaced with TREE PLRU"<<endl;
+		#endif		
 	}
 	//put data
 
@@ -81,6 +95,15 @@ void init_l1i_cache()
 		(cache_l1i[x].set[5]).valid=0;
 		(cache_l1i[x].set[6]).valid=0;
 		(cache_l1i[x].set[7]).valid=0;
+		
+		(cache_l1i[x].set[0]).mru_bit=0;
+		(cache_l1i[x].set[1]).mru_bit=0;
+		(cache_l1i[x].set[2]).mru_bit=0;
+		(cache_l1i[x].set[3]).mru_bit=0;
+		(cache_l1i[x].set[4]).mru_bit=0;
+		(cache_l1i[x].set[5]).mru_bit=0;
+		(cache_l1i[x].set[6]).mru_bit=0;
+		(cache_l1i[x].set[7]).mru_bit=0;
 	}
 
 	for (x = 0; x < 7; x++)
