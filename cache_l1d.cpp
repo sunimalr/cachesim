@@ -41,8 +41,47 @@ int l1d_check(unsigned long long address, int type)
 				{
 					//Read hit
 					cout << "L1-D READ HIT" << endl;
-				
+					return 1;
 				}
+				if(type==STORE)
+				{
+					//write hit
+					cout << "L1-D WRITE HIT" << endl;
+				}
+
+				switch(y)
+				{
+					case 0 : 
+						flip_bits(lru_bits_l1d,0,1,3);
+						break;
+					case 1 : 
+						flip_bits(lru_bits_l1d,0,1,3);
+						break;
+					case 2 : 
+						flip_bits(lru_bits_l1d,0,1,4);
+						break;
+					case 3 : 
+						flip_bits(lru_bits_l1d,0,1,4);
+						break;
+					case 4 : 
+						flip_bits(lru_bits_l1d,0,2,5);
+						break;
+					case 5 : 
+						flip_bits(lru_bits_l1d,0,2,5);
+						break;
+					case 6 : 
+						flip_bits(lru_bits_l1d,0,2,6);
+						break;
+					case 7 : 
+						flip_bits(lru_bits_l1d,0,2,6);
+						break;
+				}
+				
+				#ifdef BPLRU
+					(cache_l1d[set_index].set[y]).mru_bit=1;
+					flip_if_all_mru_bits_are_1(cache_l1d[set_index].set);
+				#endif
+
 				
 				return 1;
 			}
@@ -58,8 +97,8 @@ int l1d_check(unsigned long long address, int type)
 			isInvalid=y;
 		}
 	}
-	cout << "L1-d MISS" << endl;
-	
+	cout << "L1-D MISS" << endl;
+	//This is a write back cache. And also write allocate.
 	//get from L2 cache : TODO
 
 	//select which way to put data
@@ -73,17 +112,19 @@ int l1d_check(unsigned long long address, int type)
 		int way;
 		#ifdef BPLRU
 			way=get_8_way_bit_lru_position(cache_l1d[set_index].set);
+			//TODO: write cache_l1d[set_index].set[way]) data to L2 cache. 
 			(cache_l1d[set_index].set[way]).valid=1;
 			(cache_l1d[set_index].set[way]).tag=tag;
 			cout<<"L1-D: replaced with BIT PLRU"<<endl;
 		#else 
 			way=get_8_way_tree_lru_position(lru_bits_l1d);
+			//TODO: write cache_l1d[set_index].set[way]) data to L2 cache.
 			(cache_l1d[set_index].set[way]).valid=1;
 			(cache_l1d[set_index].set[way]).tag=tag;
 			cout<<"L1-D: replaced with TREE PLRU"<<endl;
 		#endif		
 	}
-	//put data
+	
 
 	return 0;
 }

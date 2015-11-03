@@ -6,7 +6,7 @@
 
 using namespace std;
 
-l1i_cache_set cache_l1i[64];
+l1_cache_set cache_l1i[64];
 int lru_bits_l1i[7];
 
 //Returns 1 if hit, 0 if miss);
@@ -31,6 +31,34 @@ int l1i_check(unsigned long long address)
 			{
 				//HIT
 				cout << "L1-i HIT" << endl; 
+
+				switch(y)
+				{
+					case 0 : 
+						flip_bits(lru_bits_l1i,0,1,3);
+						break;
+					case 1 : 
+						flip_bits(lru_bits_l1i,0,1,3);
+						break;
+					case 2 : 
+						flip_bits(lru_bits_l1i,0,1,4);
+						break;
+					case 3 : 
+						flip_bits(lru_bits_l1i,0,1,4);
+						break;
+					case 4 : 
+						flip_bits(lru_bits_l1i,0,2,5);
+						break;
+					case 5 : 
+						flip_bits(lru_bits_l1i,0,2,5);
+						break;
+					case 6 : 
+						flip_bits(lru_bits_l1i,0,2,6);
+						break;
+					case 7 : 
+						flip_bits(lru_bits_l1i,0,2,6);
+						break;
+				}
 				
 				#ifdef BPLRU
 					(cache_l1i[set_index].set[y]).mru_bit=1;
@@ -76,7 +104,7 @@ int l1i_check(unsigned long long address)
 			cout<<"replaced with TREE PLRU"<<endl;
 		#endif		
 	}
-	//put data
+	
 
 	return 0;
 }

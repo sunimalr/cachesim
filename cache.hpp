@@ -2,6 +2,10 @@
 #define CACHE_H
 #endif
 
+#define FETCH 100
+#define LOAD 200
+#define STORE 300
+
 struct cache_line_block{
 	int valid;
 	unsigned long long tag;

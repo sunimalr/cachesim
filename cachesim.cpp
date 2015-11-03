@@ -4,9 +4,7 @@
 #include <bitset>
 #include "cache.hpp"
 
-#define FETCH 100
-#define LOAD 200
-#define STORE 300
+
 
 using namespace std;
 int process(unsigned long long address, int instruction);
