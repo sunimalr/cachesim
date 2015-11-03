@@ -14,7 +14,8 @@ unsigned long long remove_encoded_bits(unsigned long long buffer, int type);
 int main()
 {
     //Init cache
-    void init_l1i_cache();
+    init_l1i_cache();
+    init_l1d_cache();
 	
     FILE *rm;
     unsigned long long buf[1];
@@ -31,7 +32,7 @@ int main()
   	rewind (rm);
   	long ctr=fSize/8;
     if (rm != NULL) {
-    	for(i=0;i<ctr;i++)
+    	for(i=0;i<100;i++)
     	{
         	fread(buf,8 , 1, rm);
         	switch(detect_instr_type(buf[0]))

@@ -15,7 +15,7 @@ unsigned long long get_offset(unsigned long long address)
 
 unsigned long long get_set_index(unsigned long long address)
 {
-	//Associativity = 8
+	//64 lines long cache
 	unsigned long long temp,set_index;
 	temp = address >> 6;
 	set_index = (temp & 0x3E);
@@ -29,5 +29,24 @@ unsigned long long get_tag(unsigned long long address)
 	unsigned long long tag;
 	tag = (address >> 12);
 	cout<<"tag : "<<hex<<tag<<endl;
+	return tag;
+}
+
+unsigned long long get_d2_set_index(unsigned long long address)
+{
+	//64 lines long cache
+	unsigned long long temp,set_index;
+	temp = address >> 6;
+	set_index = (temp & 0x1EE);
+	
+	cout<<"d2_set_index : "<<hex<<set_index<<endl;
+	return set_index;
+}
+
+unsigned long long get_d2_tag(unsigned long long address)
+{
+	unsigned long long tag;
+	tag = (address >> 15);
+	cout<<"d2_tag : "<<hex<<tag<<endl;
 	return tag;
 }

@@ -6,7 +6,7 @@
 
 using namespace std;
 
-l1_cache_set cache_l1d[64];
+cache_set cache_l1d[64];
 int lru_bits_l1d[7];
 
 //Returns 1 if hit, 0 if miss);

@@ -13,10 +13,10 @@ struct cache_line_block{
 };
 typedef struct cache_line_block cache_line_block;
 
-struct l1_cache_set{
+struct cache_set{
 	cache_line_block set[8];
 };
-typedef l1_cache_set l1_cache_set;
+typedef cache_set cache_set;
 
 //l1i_cache_set cache_l1i[64];
 
@@ -27,7 +27,11 @@ unsigned long long get_offset(unsigned long long address);
 unsigned long long get_set_index(unsigned long long address);
 unsigned long long get_tag(unsigned long long address);
 
+unsigned long long get_d2_set_index(unsigned long long address);
+unsigned long long get_d2_tag(unsigned long long address);
+
 void init_l1i_cache();
+void init_l1d_cache();
 
 
 int get_8_way_bit_lru_position(cache_line_block *cache_8_block);
