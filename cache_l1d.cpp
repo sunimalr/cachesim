@@ -97,9 +97,19 @@ int l1d_check(unsigned long long address, int type)
 			isInvalid=y;
 		}
 	}
-	cout << "L1-D MISS" << endl;
+	
+	if (type==STORE)
+	{
+		//Load from memory. Update the cache. Update memory.
+		cout << "L1-D WRITE MISS" << endl;
+	}
+	else if((type==LOAD)||(type==FETCH))
+	{
+		cout << "L1-D READ MISS" << endl;	
+	}
 	//This is a write back cache. And also write allocate.
 	//get from L2 cache : TODO
+	l2_check(address, type);
 
 	//select which way to put data
 	if(isInvalid != -1)//If there is an invalid block replace it

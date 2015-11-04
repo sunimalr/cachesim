@@ -81,7 +81,8 @@ int l1i_check(unsigned long long address)
 	}
 	cout << "L1-i MISS" << endl;
 	
-	//get from L2 cache : TODO
+	//get from L2 cache
+	l2_check(address, FETCH);
 
 	//select which way to put data
 	if(isInvalid != -1)//If there is an invalid block replace it

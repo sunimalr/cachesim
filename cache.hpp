@@ -22,16 +22,18 @@ typedef cache_set cache_set;
 
 int l1i_check(unsigned long long address);
 int l1d_check(unsigned long long address, int type);
+int l2_check(unsigned long long address, int type);
 
 unsigned long long get_offset(unsigned long long address);
 unsigned long long get_set_index(unsigned long long address);
 unsigned long long get_tag(unsigned long long address);
 
-unsigned long long get_d2_set_index(unsigned long long address);
-unsigned long long get_d2_tag(unsigned long long address);
+unsigned long long get_l2_set_index(unsigned long long address);
+unsigned long long get_l2_tag(unsigned long long address);
 
 void init_l1i_cache();
 void init_l1d_cache();
+void init_l2_cache();
 
 
 int get_8_way_bit_lru_position(cache_line_block *cache_8_block);
