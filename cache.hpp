@@ -31,6 +31,8 @@ unsigned long long get_tag(unsigned long long address);
 unsigned long long get_l2_set_index(unsigned long long address);
 unsigned long long get_l2_tag(unsigned long long address);
 
+unsigned long long get_victim_cache_tag(unsigned long long address);
+
 void init_l1i_cache();
 void init_l1d_cache();
 void init_l2_cache();

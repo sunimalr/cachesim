@@ -39,7 +39,7 @@ unsigned long long get_l2_set_index(unsigned long long address)
 	temp = address >> 6;
 	set_index = (temp & 0x1EE);
 	
-	cout<<"d2_set_index : "<<hex<<set_index<<endl;
+	cout<<"l2_set_index : "<<hex<<set_index<<endl;
 	return set_index;
 }
 
@@ -47,6 +47,14 @@ unsigned long long get_l2_tag(unsigned long long address)
 {
 	unsigned long long tag;
 	tag = (address >> 15);
-	cout<<"d2_tag : "<<hex<<tag<<endl;
+	cout<<"l2_tag : "<<hex<<tag<<endl;
+	return tag;
+}
+
+unsigned long long get_victim_cache_tag(unsigned long long address)
+{
+	unsigned long long tag;
+	tag = (address >> 6);
+	cout<<"victim cache tag : "<<hex<<tag<<endl;
 	return tag;
 }
