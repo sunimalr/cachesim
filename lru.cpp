@@ -6,66 +6,76 @@
 
 using namespace std;
 
-int get_8_way_tree_lru_position(int *lru_bits)
+int get_tree_lru_position(int way, int *lru_bits)
 {
-	//block0
-	if((lru_bits[0]==0)&&(lru_bits[1]==0)&&(lru_bits[3]==0))
+	int prev=-1;
+	int curr=0;
+	int lru_bits_prev;
+	
+	
+	while((curr<(way-1)))
 	{
-		//flip_bits(lru_bits,0,1,3);
-		return 0;
+
+		
+		if(lru_bits[curr]==0)//go left
+		{
+			lru_bits_prev=lru_bits[curr];
+			lru_bits[curr]=1;
+			prev=curr;
+			curr=(curr*2)+1;
+		}
+		else//go right
+		{
+
+			lru_bits_prev=lru_bits[curr];
+			lru_bits[curr]=0;
+			prev=curr;
+			curr=(curr*2)+2;
+		}
 	}
-
-	//block1
-	if((lru_bits[0]==0)&&(lru_bits[1]==0)&&(lru_bits[3]==1))
+	
+	int line;
+	if(lru_bits_prev==0)
 	{
-		//flip_bits(lru_bits,0,1,3);
-		return 1;
+		line = (prev*2+2)-way;
 	}
-
-	//block2
-	if((lru_bits[0]==0)&&(lru_bits[1]==1)&&(lru_bits[4]==0))
+	else
 	{
-		//flip_bits(lru_bits,0,1,4);
-		return 2;
-	}	
-
-	//block3
-	if((lru_bits[0]==0)&&(lru_bits[1]==1)&&(lru_bits[4]==1))
-	{
-		//flip_bits(lru_bits,0,1,4);
-		return 3;
+		line = (prev*2+3)-way;	
 	}
-
-	//block4
-	if((lru_bits[0]==1)&&(lru_bits[2]==0)&&(lru_bits[5]==0))
-	{
-		//flip_bits(lru_bits,0,2,5);
-		return 4;
-	}
-
-	//block5
-	if((lru_bits[0]==1)&&(lru_bits[2]==0)&&(lru_bits[5]==1))
-	{
-		//flip_bits(lru_bits,0,2,5);
-		return 5;
-	}
-
-	//block6
-	if((lru_bits[0]==1)&&(lru_bits[2]==1)&&(lru_bits[6]==0))
-	{
-		//flip_bits(lru_bits,0,2,6);
-		return 6;
-	}
-
-	//block7
-	if((lru_bits[0]==1)&&(lru_bits[2]==1)&&(lru_bits[6]==1))
-	{
-		//flip_bits(lru_bits,0,2,6);
-		return 7;
-	}
-
-	return -1;//Error
+	
+	return line;
 }
+
+void flip_bits_lru(int way, int *lru_bits, int line)
+{
+	int prev=-1;
+	int curr=0;
+	int left=0;
+	int right=way;
+	int mid;
+	while((curr<(way-1)))
+	{
+		if(d)
+		cout<<"LINE : "<<line<<" BITFLIP : "<<curr<<endl;
+		mid=(left+right)/2;
+		if(line>=mid)//go right
+		{
+			left=mid;
+			lru_bits[curr]=0;
+			prev=curr;
+			curr=(curr*2)+2;
+		}
+		else//go left
+		{
+			right=mid;
+			lru_bits[curr]=1;
+			prev=curr;
+			curr=(curr*2)+1;
+		}
+	}
+}
+
 
 int get_8_way_bit_lru_position(cache_line_block *cache_8_block)
 {
@@ -94,36 +104,4 @@ void flip_if_all_mru_bits_are_1(cache_line_block *cb)
 		cb[7].mru_bit=0;
 	}
 
-}
-
-//For tree plru
-void flip_bits(int *lru_bits, int pos1, int pos2, int pos3)
-{
-	int x;
-	if(lru_bits[pos1]==0)
-	{
-		lru_bits[pos1]=1;
-	}
-	else
-	{
-		lru_bits[pos1]=0;	
-	}
-
-	if(lru_bits[pos2]==0)
-	{
-		lru_bits[pos2]=1;
-	}
-	else
-	{
-		lru_bits[pos2]=0;	
-	}
-
-	if(lru_bits[pos3]==0)
-	{
-		lru_bits[pos3]=1;
-	}
-	else
-	{
-		lru_bits[pos3]=0;	
-	}
 }

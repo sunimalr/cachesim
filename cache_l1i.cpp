@@ -12,6 +12,7 @@ int lru_bits_l1i[7];
 //Returns 1 if hit, 0 if miss);
 int l1i_check(unsigned long long address)
 {
+	check_infinity_cache_l1i(address);
 	unsigned long long offset = get_offset(address);
 	unsigned long long set_index = get_set_index(address);
 	unsigned long long tag = get_tag(address);
@@ -25,40 +26,14 @@ int l1i_check(unsigned long long address)
 	{
 		if((cache_l1i[set_index].set[y]).valid==1)
 		{
-			
 			unsigned long long cache_tag = (cache_l1i[set_index].set[y]).tag;
 			if(tag == cache_tag)
 			{
 				//HIT
+				if(d)
 				cout << "L1-i HIT" << endl; 
-
-				switch(y)
-				{
-					case 0 : 
-						flip_bits(lru_bits_l1i,0,1,3);
-						break;
-					case 1 : 
-						flip_bits(lru_bits_l1i,0,1,3);
-						break;
-					case 2 : 
-						flip_bits(lru_bits_l1i,0,1,4);
-						break;
-					case 3 : 
-						flip_bits(lru_bits_l1i,0,1,4);
-						break;
-					case 4 : 
-						flip_bits(lru_bits_l1i,0,2,5);
-						break;
-					case 5 : 
-						flip_bits(lru_bits_l1i,0,2,5);
-						break;
-					case 6 : 
-						flip_bits(lru_bits_l1i,0,2,6);
-						break;
-					case 7 : 
-						flip_bits(lru_bits_l1i,0,2,6);
-						break;
-				}
+				ct_l1i_hit++;
+				flip_bits_lru(8,lru_bits_l1i,y);
 				
 				#ifdef BPLRU
 					(cache_l1i[set_index].set[y]).mru_bit=1;
@@ -68,7 +43,7 @@ int l1i_check(unsigned long long address)
 				return 1;
 			}
 			else
-			{	
+			{	if(d)
 				cout << "Tag mismatch" << endl; 
 				//return 0;	
 			}
@@ -79,8 +54,9 @@ int l1i_check(unsigned long long address)
 			isInvalid=y;
 		}
 	}
+	if(d)
 	cout << "L1-i MISS" << endl;
-	
+	ct_l1i_miss++;
 	//get from L2 cache
 	l2_check(address, FETCH);
 
@@ -97,12 +73,15 @@ int l1i_check(unsigned long long address)
 			way=get_8_way_bit_lru_position(cache_l1i[set_index].set);
 			(cache_l1i[set_index].set[way]).valid=1;
 			(cache_l1i[set_index].set[way]).tag=tag;
-			cout<<"replaced with BIT PLRU"<<endl;
+			if(d)
+			cout<<"L1-I: replaced with BIT PLRU"<<endl;
 		#else 
-			way=get_8_way_tree_lru_position(lru_bits_l1i);
+			way=get_tree_lru_position(8,lru_bits_l1i);
 			(cache_l1i[set_index].set[way]).valid=1;
 			(cache_l1i[set_index].set[way]).tag=tag;
-			cout<<"replaced with TREE PLRU"<<endl;
+			
+			if(d)
+			cout<<"L1-I: replaced with TREE PLRU : "<<way<<endl;//" : "<<temp<<endl;
 		#endif		
 	}
 	

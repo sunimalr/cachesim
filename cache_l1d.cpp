@@ -12,6 +12,7 @@ int lru_bits_l1d[7];
 //Returns 1 if hit, 0 if miss);
 int l1d_check(unsigned long long address, int type)
 {
+	check_infinity_cache_l1d(address);
 	unsigned long long offset = get_offset(address);
 	unsigned long long set_index = get_set_index(address);
 	unsigned long long tag = get_tag(address);
@@ -40,42 +41,21 @@ int l1d_check(unsigned long long address, int type)
 				if(type==LOAD)
 				{
 					//Read hit
+					if(d)
 					cout << "L1-D READ HIT" << endl;
+					ct_l1d_r_hit++;
 					return 1;
 				}
 				if(type==STORE)
 				{
 					//write hit
+					if(d)
 					cout << "L1-D WRITE HIT" << endl;
+					(cache_l1d[set_index].set[y]).dirty_bit=1;
+					ct_l1d_w_hit++;
 				}
 
-				switch(y)
-				{
-					case 0 : 
-						flip_bits(lru_bits_l1d,0,1,3);
-						break;
-					case 1 : 
-						flip_bits(lru_bits_l1d,0,1,3);
-						break;
-					case 2 : 
-						flip_bits(lru_bits_l1d,0,1,4);
-						break;
-					case 3 : 
-						flip_bits(lru_bits_l1d,0,1,4);
-						break;
-					case 4 : 
-						flip_bits(lru_bits_l1d,0,2,5);
-						break;
-					case 5 : 
-						flip_bits(lru_bits_l1d,0,2,5);
-						break;
-					case 6 : 
-						flip_bits(lru_bits_l1d,0,2,6);
-						break;
-					case 7 : 
-						flip_bits(lru_bits_l1d,0,2,6);
-						break;
-				}
+				flip_bits_lru(8, lru_bits_l1d, y);
 				
 				#ifdef BPLRU
 					(cache_l1d[set_index].set[y]).mru_bit=1;
@@ -87,6 +67,7 @@ int l1d_check(unsigned long long address, int type)
 			}
 			else
 			{	
+				if(d)
 				cout << "Tag mismatch" << endl; 
 				//return 0;	
 			}
@@ -101,11 +82,104 @@ int l1d_check(unsigned long long address, int type)
 	if (type==STORE)
 	{
 		//Load from memory. Update the cache. Update memory.
+		if(d)
 		cout << "L1-D WRITE MISS" << endl;
+		ct_l1d_w_miss++;
+		if(victim_cache_check(address,type)==1)
+		{
+			//Write to L1D;
+			if(isInvalid != -1)//If there is an invalid block replace it
+			{
+				(cache_l1d[set_index].set[isInvalid]).valid=1;
+				(cache_l1d[set_index].set[isInvalid]).tag=tag;
+			}
+			else//else use cache replacement policy and find out which block to replace
+			{
+				int way;
+				#ifdef BPLRU
+					way=get_8_way_bit_lru_position(cache_l1d[set_index].set);
+					// write cache_l1d[set_index].set[way]) data to L2 cache. 
+					if((cache_l1d[set_index].set[way]).dirty_bit==1)
+					{
+						int addr=(cache_l1d[set_index].set[way]).tag;
+						addr=addr << 6;
+						addr=addr & set_index;
+						addr=addr << 6;
+						l2_write(addr);
+					}
+					(cache_l1d[set_index].set[way]).valid=1;
+					(cache_l1d[set_index].set[way]).tag=tag;
+					if(d)
+					cout<<"L1-D: replaced with BIT PLRU"<<endl;
+				#else 
+					way=get_tree_lru_position(8,lru_bits_l1d);
+					//write cache_l1d[set_index].set[way]) data to L2 cache.
+					if((cache_l1d[set_index].set[way]).dirty_bit==1)
+					{
+						int addr=(cache_l1d[set_index].set[way]).tag;
+						addr=addr << 6;
+						addr=addr & set_index;
+						addr=addr << 6;
+						l2_write(addr);
+					}
+					(cache_l1d[set_index].set[way]).valid=1;
+					(cache_l1d[set_index].set[way]).tag=tag;
+					if(d)
+					cout<<"L1-D: replaced with TREE PLRU"<<endl;
+				#endif		
+			}
+			return 0;
+		}
 	}
 	else if((type==LOAD)||(type==FETCH))
 	{
-		cout << "L1-D READ MISS" << endl;	
+		if(d)
+		cout << "L1-D READ MISS" << endl;
+		ct_l1d_r_miss++;
+		if(victim_cache_check(address,type)==1)
+		{
+			if(isInvalid != -1)//If there is an invalid block replace it
+			{
+				(cache_l1d[set_index].set[isInvalid]).valid=1;
+				(cache_l1d[set_index].set[isInvalid]).tag=tag;
+			}
+			else//else use cache replacement policy and find out which block to replace
+			{
+				int way;
+				#ifdef BPLRU
+					way=get_8_way_bit_lru_position(cache_l1d[set_index].set);
+					// write cache_l1d[set_index].set[way]) data to L2 cache. 
+					if((cache_l1d[set_index].set[way]).dirty_bit==1)
+					{
+						int addr=(cache_l1d[set_index].set[way]).tag;
+						addr=addr << 6;
+						addr=addr & set_index;
+						addr=addr << 6;
+						l2_write(addr);
+					}
+					(cache_l1d[set_index].set[way]).valid=1;
+					(cache_l1d[set_index].set[way]).tag=tag;
+					if(d)
+					cout<<"L1-D: replaced with BIT PLRU"<<endl;
+				#else 
+					way=get_tree_lru_position(8,lru_bits_l1d);
+					//write cache_l1d[set_index].set[way]) data to L2 cache.
+					if((cache_l1d[set_index].set[way]).dirty_bit==1)
+					{
+						int addr=(cache_l1d[set_index].set[way]).tag;
+						addr=addr << 6;
+						addr=addr & set_index;
+						addr=addr << 6;
+						l2_write(addr);
+					}
+					(cache_l1d[set_index].set[way]).valid=1;
+					(cache_l1d[set_index].set[way]).tag=tag;
+					if(d)
+					cout<<"L1-D: replaced with TREE PLRU"<<endl;
+				#endif		
+			}
+			return 0;
+		}	
 	}
 	//This is a write back cache. And also write allocate.
 	//get from L2 cache : TODO
@@ -122,15 +196,32 @@ int l1d_check(unsigned long long address, int type)
 		int way;
 		#ifdef BPLRU
 			way=get_8_way_bit_lru_position(cache_l1d[set_index].set);
-			//TODO: write cache_l1d[set_index].set[way]) data to L2 cache. 
+			if((cache_l1d[set_index].set[way]).dirty_bit==1)
+			{
+				int addr=(cache_l1d[set_index].set[way]).tag;
+				addr=addr << 6;
+				addr=addr & set_index;
+				addr=addr << 6;
+				l2_write(addr);
+			} 
 			(cache_l1d[set_index].set[way]).valid=1;
 			(cache_l1d[set_index].set[way]).tag=tag;
+			if(d)
 			cout<<"L1-D: replaced with BIT PLRU"<<endl;
 		#else 
-			way=get_8_way_tree_lru_position(lru_bits_l1d);
-			//TODO: write cache_l1d[set_index].set[way]) data to L2 cache.
+			way=get_tree_lru_position(8,lru_bits_l1d);
+			//write cache_l1d[set_index].set[way]) data to L2 cache.
+			if((cache_l1d[set_index].set[way]).dirty_bit==1)
+			{
+				int addr=(cache_l1d[set_index].set[way]).tag;
+				addr=addr << 6;
+				addr=addr & set_index;
+				addr=addr << 6;
+				l2_write(addr);
+			} 
 			(cache_l1d[set_index].set[way]).valid=1;
 			(cache_l1d[set_index].set[way]).tag=tag;
+			if(d)
 			cout<<"L1-D: replaced with TREE PLRU"<<endl;
 		#endif		
 	}
@@ -138,6 +229,8 @@ int l1d_check(unsigned long long address, int type)
 
 	return 0;
 }
+
+
 
 void init_l1d_cache()
 {
@@ -161,6 +254,15 @@ void init_l1d_cache()
 		(cache_l1d[x].set[5]).mru_bit=0;
 		(cache_l1d[x].set[6]).mru_bit=0;
 		(cache_l1d[x].set[7]).mru_bit=0;
+
+		(cache_l1d[x].set[0]).dirty_bit=0;
+		(cache_l1d[x].set[1]).dirty_bit=0;
+		(cache_l1d[x].set[2]).dirty_bit=0;
+		(cache_l1d[x].set[3]).dirty_bit=0;
+		(cache_l1d[x].set[4]).dirty_bit=0;
+		(cache_l1d[x].set[5]).dirty_bit=0;
+		(cache_l1d[x].set[6]).dirty_bit=0;
+		(cache_l1d[x].set[7]).dirty_bit=0;
 	}
 
 	for (x = 0; x < 7; x++)
